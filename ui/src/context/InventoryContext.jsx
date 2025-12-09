@@ -34,11 +34,21 @@ export function InventoryProvider({ children }) {
   };
 
   const decreaseInventoryForOrder = (orderItems) => {
-    orderItems.forEach((item) => {
-      const inventoryItem = getInventoryByMenuId(item.menuId);
-      if (inventoryItem) {
-        updateInventory(item.menuId, -item.quantity);
-      }
+    // 한 번에 모든 재고를 업데이트하여 리렌더링 최소화
+    setInventory((prev) => {
+      const updates = new Map();
+      orderItems.forEach((item) => {
+        const currentQty = updates.get(item.menuId) || 
+          prev.find((inv) => inv.menuId === item.menuId)?.quantity || 0;
+        updates.set(item.menuId, Math.max(0, currentQty - item.quantity));
+      });
+
+      return prev.map((item) => {
+        if (updates.has(item.menuId)) {
+          return { ...item, quantity: updates.get(item.menuId) };
+        }
+        return item;
+      });
     });
   };
 
@@ -52,6 +62,11 @@ export function InventoryProvider({ children }) {
     return true;
   };
 
+  const canAddToCart = (menuId, quantity = 1) => {
+    const inventoryItem = getInventoryByMenuId(menuId);
+    return inventoryItem && inventoryItem.quantity >= quantity;
+  };
+
   return (
     <InventoryContext.Provider
       value={{
@@ -61,6 +76,7 @@ export function InventoryProvider({ children }) {
         getInventoryByMenuId,
         decreaseInventoryForOrder,
         canOrder,
+        canAddToCart,
       }}
     >
       {children}

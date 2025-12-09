@@ -30,6 +30,7 @@ function OrderList() {
         <button
           className="order-list__status-btn order-list__status-btn--primary"
           onClick={() => updateOrderStatus(order.id, 'PREPARING')}
+          aria-label={`주문 #${order.id} 제조 시작`}
         >
           제조 시작
         </button>
@@ -39,13 +40,14 @@ function OrderList() {
         <button
           className="order-list__status-btn order-list__status-btn--secondary"
           onClick={() => updateOrderStatus(order.id, 'COMPLETED')}
+          aria-label={`주문 #${order.id} 제조 완료`}
         >
           제조 완료
         </button>
       );
     } else {
       return (
-        <span className="order-list__status-completed">제조 완료</span>
+        <span className="order-list__status-completed" aria-label="제조 완료">제조 완료</span>
       );
     }
   };
@@ -56,9 +58,9 @@ function OrderList() {
       {orders.length === 0 ? (
         <p className="order-list__empty">주문이 없습니다.</p>
       ) : (
-        <div className="order-list__items">
+        <div className="order-list__items" role="list">
           {orders.map((order) => (
-            <div key={order.id} className="order-list__item">
+            <div key={order.id} className="order-list__item" role="listitem">
               <div className="order-list__item-info">
                 <div className="order-list__time">
                   {formatDate(order.orderTime)}
@@ -82,4 +84,3 @@ function OrderList() {
 }
 
 export default OrderList;
-

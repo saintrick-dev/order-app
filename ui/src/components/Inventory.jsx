@@ -21,6 +21,7 @@ function Inventory() {
                 <span
                   className="inventory__status"
                   style={{ color: status.color }}
+                  aria-label={`재고 상태: ${status.text}`}
                 >
                   {status.text}
                 </span>
@@ -30,12 +31,14 @@ function Inventory() {
                   className="inventory__btn inventory__btn--decrease"
                   onClick={() => updateInventory(item.menuId, -1)}
                   disabled={item.quantity === 0}
+                  aria-label={`${item.menuName} 재고 감소`}
                 >
                   -
                 </button>
                 <button
                   className="inventory__btn inventory__btn--increase"
                   onClick={() => updateInventory(item.menuId, 1)}
+                  aria-label={`${item.menuName} 재고 증가`}
                 >
                   +
                 </button>

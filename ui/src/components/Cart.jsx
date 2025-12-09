@@ -8,6 +8,11 @@ function Cart({ items, onOrder, onUpdateQuantity }) {
     return ` (${options.map((opt) => opt.name).join(', ')})`;
   };
 
+  const getItemKey = (item) => {
+    const optionIds = item.options?.map((opt) => opt.id).sort().join(',') || '';
+    return `${item.menuId}-${optionIds}`;
+  };
+
   const handleQuantityChange = (index, delta) => {
     const newQuantity = items[index].quantity + delta;
     if (newQuantity >= 1) {
@@ -34,7 +39,7 @@ function Cart({ items, onOrder, onUpdateQuantity }) {
             <p className="cart__empty">장바구니가 비어있습니다.</p>
           ) : (
             items.map((item, index) => (
-              <div key={index} className="cart__item">
+              <div key={getItemKey(item)} className="cart__item">
                 <span className="cart__item-name">
                   {item.menuName}
                   {formatOptions(item.options)}
@@ -43,6 +48,7 @@ function Cart({ items, onOrder, onUpdateQuantity }) {
                   <button
                     className="cart__qty-btn"
                     onClick={() => handleQuantityChange(index, -1)}
+                    aria-label="수량 감소"
                   >
                     -
                   </button>
@@ -50,6 +56,7 @@ function Cart({ items, onOrder, onUpdateQuantity }) {
                   <button
                     className="cart__qty-btn"
                     onClick={() => handleQuantityChange(index, 1)}
+                    aria-label="수량 증가"
                   >
                     +
                   </button>
@@ -60,6 +67,7 @@ function Cart({ items, onOrder, onUpdateQuantity }) {
                 <button
                   className="cart__remove-btn"
                   onClick={() => handleRemoveItem(index)}
+                  aria-label="항목 삭제"
                 >
                   ✕
                 </button>
@@ -71,6 +79,7 @@ function Cart({ items, onOrder, onUpdateQuantity }) {
           className="cart__order-button"
           onClick={onOrder}
           disabled={items.length === 0}
+          aria-label="주문하기"
         >
           주문하기
         </button>

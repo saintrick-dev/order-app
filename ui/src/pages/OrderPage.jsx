@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useOrders } from '../context/OrderContext';
 import { useInventory } from '../context/InventoryContext';
+import { useToast } from '../context/ToastContext';
 import MenuCard from '../components/MenuCard';
 import Cart from '../components/Cart';
 import { menuItems } from '../data/menuData';
@@ -9,9 +10,16 @@ import './OrderPage.css';
 function OrderPage() {
   const [cartItems, setCartItems] = useState([]);
   const { addOrder } = useOrders();
-  const { canOrder, decreaseInventoryForOrder } = useInventory();
+  const { canOrder, canAddToCart, decreaseInventoryForOrder } = useInventory();
+  const { showToast } = useToast();
 
-  const handleAddToCart = (menu, selectedOptions) => {
+  const handleAddToCart = useCallback((menu, selectedOptions) => {
+    // 재고 확인
+    if (!canAddToCart(menu.id, 1)) {
+      showToast('재고가 부족합니다.', 'error');
+      return;
+    }
+
     const optionPrice = selectedOptions.reduce((sum, opt) => sum + opt.price, 0);
     const itemTotalPrice = menu.price + optionPrice;
 
@@ -23,18 +31,25 @@ function OrderPage() {
     });
 
     if (existingIndex >= 0) {
-      // 수량 증가
+      // 수량 증가 시 재고 확인
+      const newQuantity = cartItems[existingIndex].quantity + 1;
+      if (!canAddToCart(menu.id, newQuantity)) {
+        showToast('재고가 부족합니다.', 'error');
+        return;
+      }
+
       setCartItems((prev) =>
         prev.map((item, index) =>
           index === existingIndex
             ? {
                 ...item,
-                quantity: item.quantity + 1,
+                quantity: newQuantity,
                 totalPrice: item.totalPrice + itemTotalPrice,
               }
             : item
         )
       );
+      showToast('장바구니에 추가되었습니다.', 'success');
     } else {
       // 새 항목 추가
       const newItem = {
@@ -47,54 +62,71 @@ function OrderPage() {
         totalPrice: itemTotalPrice,
       };
       setCartItems((prev) => [...prev, newItem]);
+      showToast('장바구니에 추가되었습니다.', 'success');
     }
-  };
+  }, [cartItems, canAddToCart, showToast]);
 
-  const handleUpdateQuantity = (index, newQuantity) => {
+  const handleUpdateQuantity = useCallback((index, newQuantity) => {
     if (newQuantity <= 0) {
       // 항목 삭제
       setCartItems((prev) => prev.filter((_, i) => i !== index));
-    } else {
-      // 수량 업데이트
-      setCartItems((prev) =>
-        prev.map((item, i) => {
-          if (i === index) {
-            const unitPrice = item.menuPrice + item.optionPrice;
-            return {
-              ...item,
-              quantity: newQuantity,
-              totalPrice: unitPrice * newQuantity,
-            };
-          }
-          return item;
-        })
-      );
+      return;
     }
-  };
 
-  const handleOrder = () => {
-    if (cartItems.length === 0) return;
+    const item = cartItems[index];
+    // 재고 확인
+    if (!canAddToCart(item.menuId, newQuantity)) {
+      showToast('재고가 부족합니다.', 'error');
+      return;
+    }
+
+    // 수량 업데이트
+    setCartItems((prev) =>
+      prev.map((item, i) => {
+        if (i === index) {
+          const unitPrice = item.menuPrice + item.optionPrice;
+          return {
+            ...item,
+            quantity: newQuantity,
+            totalPrice: unitPrice * newQuantity,
+          };
+        }
+        return item;
+      })
+    );
+  }, [cartItems, canAddToCart, showToast]);
+
+  const handleOrder = useCallback(() => {
+    if (cartItems.length === 0) {
+      showToast('장바구니가 비어있습니다.', 'warning');
+      return;
+    }
 
     // 재고 확인
     if (!canOrder(cartItems)) {
-      alert('재고가 부족합니다. 주문할 수 없습니다.');
+      showToast('재고가 부족합니다. 주문할 수 없습니다.', 'error');
       return;
     }
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
     
-    // 주문 추가
-    addOrder({
-      items: cartItems,
-      totalPrice: totalPrice,
-    });
+    try {
+      // 주문 추가
+      addOrder({
+        items: cartItems,
+        totalPrice: totalPrice,
+      });
 
-    // 재고 감소
-    decreaseInventoryForOrder(cartItems);
+      // 재고 감소
+      decreaseInventoryForOrder(cartItems);
 
-    alert(`주문이 완료되었습니다!\n총 금액: ${totalPrice.toLocaleString()}원`);
-    setCartItems([]);
-  };
+      showToast(`주문이 완료되었습니다! 총 금액: ${totalPrice.toLocaleString()}원`, 'success');
+      setCartItems([]);
+    } catch (error) {
+      showToast('주문 처리 중 오류가 발생했습니다.', 'error');
+      console.error('Order error:', error);
+    }
+  }, [cartItems, canOrder, addOrder, decreaseInventoryForOrder, showToast]);
 
   return (
     <div className="order-page">
