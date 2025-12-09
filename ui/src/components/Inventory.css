@@ -1,0 +1,96 @@
+.inventory {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.inventory__title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 1.5rem 0;
+}
+
+.inventory__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.inventory__card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  background-color: #f9fafb;
+}
+
+.inventory__menu-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 1rem 0;
+}
+
+.inventory__info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.inventory__quantity {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.inventory__status {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.inventory__controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.inventory__btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #3b82f6;
+  background-color: #fff;
+  color: #3b82f6;
+  border-radius: 6px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.inventory__btn:hover:not(:disabled) {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.inventory__btn:disabled {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.inventory__btn--increase {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.inventory__btn--increase:hover {
+  background-color: #2563eb;
+}

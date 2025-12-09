@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useOrders } from '../context/OrderContext';
+import { useInventory } from '../context/InventoryContext';
 import MenuCard from '../components/MenuCard';
 import Cart from '../components/Cart';
 import { menuItems } from '../data/menuData';
@@ -6,6 +8,8 @@ import './OrderPage.css';
 
 function OrderPage() {
   const [cartItems, setCartItems] = useState([]);
+  const { addOrder } = useOrders();
+  const { canOrder, decreaseInventoryForOrder } = useInventory();
 
   const handleAddToCart = (menu, selectedOptions) => {
     const optionPrice = selectedOptions.reduce((sum, opt) => sum + opt.price, 0);
@@ -71,7 +75,23 @@ function OrderPage() {
   const handleOrder = () => {
     if (cartItems.length === 0) return;
 
+    // 재고 확인
+    if (!canOrder(cartItems)) {
+      alert('재고가 부족합니다. 주문할 수 없습니다.');
+      return;
+    }
+
     const totalPrice = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
+    
+    // 주문 추가
+    addOrder({
+      items: cartItems,
+      totalPrice: totalPrice,
+    });
+
+    // 재고 감소
+    decreaseInventoryForOrder(cartItems);
+
     alert(`주문이 완료되었습니다!\n총 금액: ${totalPrice.toLocaleString()}원`);
     setCartItems([]);
   };

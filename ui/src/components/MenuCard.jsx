@@ -1,9 +1,13 @@
 import { useState } from 'react';
+import { useInventory } from '../context/InventoryContext';
 import { options } from '../data/menuData';
 import './MenuCard.css';
 
 function MenuCard({ menu, onAddToCart }) {
   const [selectedOptions, setSelectedOptions] = useState([]);
+  const { getInventoryByMenuId } = useInventory();
+  const inventoryItem = getInventoryByMenuId(menu.id);
+  const isOutOfStock = !inventoryItem || inventoryItem.quantity === 0;
 
   const handleOptionChange = (option) => {
     setSelectedOptions((prev) => {
@@ -16,6 +20,10 @@ function MenuCard({ menu, onAddToCart }) {
   };
 
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      alert('품절된 상품입니다.');
+      return;
+    }
     onAddToCart(menu, selectedOptions);
     setSelectedOptions([]);
   };
@@ -39,6 +47,9 @@ function MenuCard({ menu, onAddToCart }) {
         <h3 className="menu-card__name">{menu.name}</h3>
         <p className="menu-card__price">{menu.price.toLocaleString()}원</p>
         <p className="menu-card__description">{menu.description}</p>
+        {isOutOfStock && (
+          <p className="menu-card__out-of-stock">품절</p>
+        )}
         <div className="menu-card__options">
           {options.map((option) => (
             <label key={option.id} className="menu-card__option">
@@ -46,6 +57,7 @@ function MenuCard({ menu, onAddToCart }) {
                 type="checkbox"
                 checked={selectedOptions.some((opt) => opt.id === option.id)}
                 onChange={() => handleOptionChange(option)}
+                disabled={isOutOfStock}
               />
               <span>
                 {option.name} (+{option.price.toLocaleString()}원)
@@ -53,8 +65,12 @@ function MenuCard({ menu, onAddToCart }) {
             </label>
           ))}
         </div>
-        <button className="menu-card__button" onClick={handleAddToCart}>
-          담기
+        <button
+          className="menu-card__button"
+          onClick={handleAddToCart}
+          disabled={isOutOfStock}
+        >
+          {isOutOfStock ? '품절' : '담기'}
         </button>
       </div>
     </div>
@@ -62,4 +78,3 @@ function MenuCard({ menu, onAddToCart }) {
 }
 
 export default MenuCard;
-
