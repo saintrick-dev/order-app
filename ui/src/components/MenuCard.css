@@ -1,0 +1,103 @@
+.menu-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-card__image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-bottom: 1px solid #ddd;
+}
+
+.menu-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-card__image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+.menu-card__placeholder-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.menu-card__content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-card__name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.menu-card__price {
+  font-size: 1.1rem;
+  color: #2563eb;
+  font-weight: 700;
+  margin: 0;
+}
+
+.menu-card__description {
+  font-size: 0.875rem;
+  color: #888;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-card__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.menu-card__option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.menu-card__option input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.menu-card__button {
+  margin-top: 0.75rem;
+  padding: 0.625rem 1rem;
+  background-color: #fff;
+  border: 1px solid #333;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-card__button:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+

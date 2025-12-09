@@ -1,0 +1,17 @@
+.order-page {
+  padding-bottom: 180px; /* 장바구니 높이만큼 여백 */
+}
+
+.order-page__menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+
+@media (max-width: 640px) {
+  .order-page__menu-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -1,0 +1,21 @@
+.app {
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.app__main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.app__placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #666;
+  font-size: 1rem;
+}
