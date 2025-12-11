@@ -1,0 +1,10 @@
+# Render.com 배포 설정
+# 이 파일은 참고용이며, Render 대시보드에서 직접 설정해야 합니다.
+
+# 백엔드 Web Service 설정:
+# - Name: cozy-coffee-backend (또는 원하는 이름)
+# - Environment: Node
+# - Build Command: cd server && npm install
+# - Start Command: cd server && npm start
+# - Root Directory: (비워두기 - 프로젝트 루트가 기본값)
+

@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 // 미들웨어
 // CORS 설정: 프로덕션에서는 특정 origin만 허용하도록 설정 가능
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || '*', // 프로덕션에서는 실제 프론트엔드 URL로 변경
+  origin: process.env.FRONTEND_URL || process.env.CLIENT_ORIGIN || '*', // 프로덕션에서는 실제 프론트엔드 URL로 변경
   credentials: true,
 };
 app.use(cors(corsOptions));
