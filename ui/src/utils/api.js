@@ -1,20 +1,56 @@
 // 환경 변수에서 API URL 가져오기 (빌드 시점에 주입됨)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const isProduction = import.meta.env.MODE === 'production';
+const envApiUrl = import.meta.env.VITE_API_URL;
+
+// 프로덕션 백엔드 URL (기본값)
+const PRODUCTION_API_URL = 'https://order-app-backend-8jtr.onrender.com/api';
+
+// 프로덕션 환경에서는 환경 변수가 필수
+let API_BASE_URL;
+if (isProduction) {
+  // 프로덕션 환경: 환경 변수가 없으면 기본 프로덕션 URL 사용
+  if (!envApiUrl || envApiUrl === 'undefined' || envApiUrl === '') {
+    console.warn('⚠️ VITE_API_URL이 설정되지 않아 기본 프로덕션 URL을 사용합니다.');
+    console.warn('⚠️ Render 대시보드에서 Environment Variables에 VITE_API_URL을 설정하는 것을 권장합니다.');
+    API_BASE_URL = PRODUCTION_API_URL;
+  } else if (envApiUrl.includes('localhost') || envApiUrl.includes('127.0.0.1')) {
+    console.error('❌ 프로덕션 환경에서 localhost를 사용할 수 없습니다!');
+    console.error('❌ 기본 프로덕션 URL을 사용합니다.');
+    API_BASE_URL = PRODUCTION_API_URL;
+  } else {
+    API_BASE_URL = envApiUrl;
+  }
+} else {
+  // 개발 환경: 환경 변수가 있으면 사용, 없으면 프로덕션 URL 사용 (로컬 개발 시)
+  API_BASE_URL = envApiUrl || PRODUCTION_API_URL;
+}
 
 // 디버깅: 현재 사용 중인 API URL 확인
 console.log('🔧 API Base URL:', API_BASE_URL);
 console.log('🔧 Environment:', import.meta.env.MODE);
-console.log('🔧 VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('🔧 VITE_API_URL (env):', envApiUrl);
+console.log('🔧 Is Production:', isProduction);
 
 // API URL 유효성 검사
 function validateApiUrl() {
-  if (!API_BASE_URL || API_BASE_URL === 'undefined') {
-    console.error('❌ VITE_API_URL이 설정되지 않았습니다.');
-    return false;
+  if (!API_BASE_URL || API_BASE_URL === 'undefined' || API_BASE_URL === 'null') {
+    if (isProduction) {
+      console.error('❌ 프로덕션 환경에서 API URL이 설정되지 않았습니다.');
+      console.error('❌ Render 대시보드 → Static Site → Environment Variables');
+      console.error('❌ Key: VITE_API_URL');
+      console.error('❌ Value: https://your-backend.onrender.com/api');
+      return false;
+    } else {
+      console.error('❌ 개발 환경에서 API URL이 설정되지 않았습니다.');
+      return false;
+    }
   }
   
-  if (API_BASE_URL === 'http://localhost:3000/api' && import.meta.env.MODE === 'production') {
-    console.warn('⚠️ 프로덕션 환경에서 localhost를 사용하고 있습니다. VITE_API_URL을 설정해주세요.');
+  // 프로덕션에서 localhost 사용 방지
+  if (isProduction && (API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1'))) {
+    console.error('❌ 프로덕션 환경에서 localhost를 사용할 수 없습니다!');
+    console.error('❌ VITE_API_URL을 프로덕션 백엔드 URL로 설정해주세요.');
+    return false;
   }
   
   return true;
@@ -47,12 +83,23 @@ function getErrorMessage(error, url) {
 }
 
 async function apiRequest(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  // API URL 유효성 검사
+  // API URL 유효성 검사 (요청 전에 먼저 확인)
   if (!validateApiUrl()) {
-    throw new Error('API 서버 URL이 설정되지 않았습니다. 환경 변수 VITE_API_URL을 확인해주세요.');
+    if (isProduction) {
+      throw new Error(
+        '프로덕션 환경에서 API 서버 URL이 설정되지 않았습니다.\n\n' +
+        'Render 대시보드에서 다음을 설정해주세요:\n' +
+        '1. Static Site → Environment Variables\n' +
+        '2. Key: VITE_API_URL\n' +
+        '3. Value: https://your-backend.onrender.com/api\n' +
+        '4. 설정 후 재배포'
+      );
+    } else {
+      throw new Error('API 서버 URL이 설정되지 않았습니다. 환경 변수 VITE_API_URL을 확인해주세요.');
+    }
   }
+  
+  const url = `${API_BASE_URL}${endpoint}`;
   
   const config = {
     headers: {
