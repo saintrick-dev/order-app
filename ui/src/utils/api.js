@@ -1,4 +1,10 @@
+// 환경 변수에서 API URL 가져오기 (빌드 시점에 주입됨)
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+// 디버깅: 현재 사용 중인 API URL 확인
+console.log('🔧 API Base URL:', API_BASE_URL);
+console.log('🔧 Environment:', import.meta.env.MODE);
+console.log('🔧 VITE_API_URL:', import.meta.env.VITE_API_URL);
 
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;

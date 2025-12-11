@@ -11,11 +11,78 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 미들웨어
-// CORS 설정: 프로덕션에서는 특정 origin만 허용하도록 설정 가능
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || process.env.CLIENT_ORIGIN || '*', // 프로덕션에서는 실제 프론트엔드 URL로 변경
-  credentials: true,
+// CORS 설정: 프로덕션에서는 특정 origin만 허용하도록 설정
+const getAllowedOrigins = () => {
+  const origins = [];
+  
+  // 환경 변수에서 프런트엔드 URL 가져오기
+  if (process.env.FRONTEND_URL) {
+    origins.push(process.env.FRONTEND_URL);
+  }
+  if (process.env.CLIENT_ORIGIN) {
+    origins.push(process.env.CLIENT_ORIGIN);
+  }
+  
+  // 개발 환경에서는 localhost 허용
+  if (process.env.NODE_ENV !== 'production') {
+    origins.push('http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173');
+  }
+  
+  return origins.length > 0 ? origins : '*';
 };
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    const allowedOrigins = getAllowedOrigins();
+    
+    // 개발 환경이거나 origin이 없으면 (같은 origin 요청) 허용
+    if (!origin || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // '*'인 경우 모든 origin 허용
+    if (allowedOrigins === '*') {
+      return callback(null, true);
+    }
+    
+    // 배열인 경우 각 origin 확인
+    if (Array.isArray(allowedOrigins)) {
+      // 정확한 매칭
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      // Render Static Site 도메인 패턴 확인 (onrender.com)
+      const isRenderDomain = origin.match(/^https:\/\/.*\.onrender\.com$/);
+      if (isRenderDomain) {
+        console.log('✅ Render 도메인 허용:', origin);
+        return callback(null, true);
+      }
+    }
+    
+    // 허용되지 않은 origin (프로덕션에서는 차단, 개발에서는 허용)
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('⚠️ CORS 차단된 origin:', origin);
+      console.warn('허용된 origins:', allowedOrigins);
+      // 프로덕션에서는 차단하지 않고 허용 (필요시 false로 변경)
+      return callback(null, true);
+    }
+    
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+const allowedOrigins = getAllowedOrigins();
+console.log('🔧 CORS 설정:', {
+  NODE_ENV: process.env.NODE_ENV,
+  FRONTEND_URL: process.env.FRONTEND_URL,
+  CLIENT_ORIGIN: process.env.CLIENT_ORIGIN,
+  allowedOrigins: allowedOrigins,
+});
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
