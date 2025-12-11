@@ -2,10 +2,14 @@ import { useOrders } from '../context/OrderContext';
 import './OrderList.css';
 
 function OrderList() {
-  const { orders, updateOrderStatus } = useOrders();
+  const { orders, updateOrderStatus, loading, error } = useOrders();
 
   const formatDate = (date) => {
+    // 백엔드에서 받은 날짜 문자열을 Date 객체로 변환
     const d = new Date(date);
+    if (isNaN(d.getTime())) {
+      return '날짜 없음';
+    }
     const month = d.getMonth() + 1;
     const day = d.getDate();
     const hours = d.getHours();
@@ -52,6 +56,27 @@ function OrderList() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="order-list">
+        <h2 className="order-list__title">주문 현황</h2>
+        <div className="order-list__loading">주문 정보를 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="order-list">
+        <h2 className="order-list__title">주문 현황</h2>
+        <div className="order-list__error">
+          <p>주문 정보를 불러올 수 없습니다.</p>
+          <p className="order-list__error-message">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="order-list">
       <h2 className="order-list__title">주문 현황</h2>
@@ -63,7 +88,7 @@ function OrderList() {
             <div key={order.id} className="order-list__item" role="listitem">
               <div className="order-list__item-info">
                 <div className="order-list__time">
-                  {formatDate(order.orderTime)}
+                  {formatDate(order.orderTime || order.order_time)}
                 </div>
                 <div className="order-list__content">
                   {formatOrderItems(order.items)}

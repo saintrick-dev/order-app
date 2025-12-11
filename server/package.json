@@ -2,10 +2,10 @@
   "name": "cozy-coffee-server",
   "version": "1.0.0",
   "description": "COZY Coffee 주문 앱 백엔드 서버",
-  "main": "server.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "dev": "nodemon server.js",
     "db:create": "node db/create-database.js",
     "db:init": "node db/init.js",

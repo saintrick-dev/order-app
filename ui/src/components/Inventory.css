@@ -94,3 +94,17 @@
 .inventory__btn--increase:hover {
   background-color: #2563eb;
 }
+
+.inventory__loading,
+.inventory__error,
+.inventory__empty {
+  padding: 2rem 0;
+  text-align: center;
+  color: #666;
+}
+
+.inventory__error-message {
+  color: #dc2626;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}

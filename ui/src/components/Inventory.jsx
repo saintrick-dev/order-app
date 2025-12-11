@@ -2,7 +2,39 @@ import { useInventory } from '../context/InventoryContext';
 import './Inventory.css';
 
 function Inventory() {
-  const { inventory, updateInventory, getInventoryStatus } = useInventory();
+  const { inventory, updateInventory, getInventoryStatus, loading, error } = useInventory();
+
+  if (loading) {
+    return (
+      <div className="inventory">
+        <h2 className="inventory__title">재고 현황</h2>
+        <div className="inventory__loading">재고 정보를 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="inventory">
+        <h2 className="inventory__title">재고 현황</h2>
+        <div className="inventory__error">
+          <p>재고 정보를 불러올 수 없습니다.</p>
+          <p className="inventory__error-message">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!inventory || inventory.length === 0) {
+    return (
+      <div className="inventory">
+        <h2 className="inventory__title">재고 현황</h2>
+        <div className="inventory__empty">
+          <p>재고 정보가 없습니다.</p>
+        </div>
+      </div>
+    );
+  }
 
   // 처음 3개 메뉴만 표시
   const displayItems = inventory.slice(0, 3);

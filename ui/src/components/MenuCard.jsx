@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import { useToast } from '../context/ToastContext';
-import { options } from '../data/menuData';
 import './MenuCard.css';
 
 function MenuCard({ menu, onAddToCart }) {
@@ -10,6 +9,9 @@ function MenuCard({ menu, onAddToCart }) {
   const { showToast } = useToast();
   const inventoryItem = getInventoryByMenuId(menu.id);
   const isOutOfStock = !inventoryItem || inventoryItem.quantity === 0;
+  
+  // 메뉴의 options 사용 (백엔드 API에서 가져온 데이터)
+  const options = menu.options || [];
 
   const handleOptionChange = (option) => {
     setSelectedOptions((prev) => {

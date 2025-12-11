@@ -4,13 +4,12 @@ import { useInventory } from '../context/InventoryContext';
 import { useToast } from '../context/ToastContext';
 import MenuCard from '../components/MenuCard';
 import Cart from '../components/Cart';
-import { menuItems } from '../data/menuData';
 import './OrderPage.css';
 
 function OrderPage() {
   const [cartItems, setCartItems] = useState([]);
   const { addOrder } = useOrders();
-  const { canOrder, canAddToCart, decreaseInventoryForOrder } = useInventory();
+  const { menus, canOrder, canAddToCart, decreaseInventoryForOrder, loading, error } = useInventory();
   const { showToast } = useToast();
 
   const handleAddToCart = useCallback((menu, selectedOptions) => {
@@ -96,7 +95,7 @@ function OrderPage() {
     );
   }, [cartItems, canAddToCart, showToast]);
 
-  const handleOrder = useCallback(() => {
+  const handleOrder = useCallback(async () => {
     if (cartItems.length === 0) {
       showToast('장바구니가 비어있습니다.', 'warning');
       return;
@@ -111,27 +110,75 @@ function OrderPage() {
     const totalPrice = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
     
     try {
-      // 주문 추가
-      addOrder({
-        items: cartItems,
+      // 주문 항목 변환 (백엔드 API 형식에 맞춤)
+      const orderItems = cartItems.map((item) => ({
+        menuId: item.menuId,
+        quantity: item.quantity,
+        options: item.options || [],
+      }));
+
+      // 주문 생성
+      await addOrder({
+        items: orderItems,
         totalPrice: totalPrice,
       });
 
-      // 재고 감소
-      decreaseInventoryForOrder(cartItems);
+      // 재고 새로고침 (백엔드에서 재고가 감소됨)
+      await decreaseInventoryForOrder(cartItems);
 
       showToast(`주문이 완료되었습니다! 총 금액: ${totalPrice.toLocaleString()}원`, 'success');
       setCartItems([]);
     } catch (error) {
-      showToast('주문 처리 중 오류가 발생했습니다.', 'error');
+      showToast(error.message || '주문 처리 중 오류가 발생했습니다.', 'error');
       console.error('Order error:', error);
     }
   }, [cartItems, canOrder, addOrder, decreaseInventoryForOrder, showToast]);
 
+  if (loading) {
+    return (
+      <div className="order-page">
+        <div className="order-page__loading">메뉴를 불러오는 중...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="order-page">
+        <div className="order-page__error">
+          <p>메뉴를 불러오는 중 오류가 발생했습니다.</p>
+          <p className="order-page__error-message">{error}</p>
+          <button 
+            className="order-page__retry-btn"
+            onClick={() => window.location.reload()}
+          >
+            새로고침
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!menus || menus.length === 0) {
+    return (
+      <div className="order-page">
+        <div className="order-page__empty">
+          <p>표시할 메뉴가 없습니다.</p>
+          <button 
+            className="order-page__retry-btn"
+            onClick={() => window.location.reload()}
+          >
+            새로고침
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="order-page">
       <div className="order-page__menu-grid">
-        {menuItems.map((menu) => (
+        {menus.map((menu) => (
           <MenuCard key={menu.id} menu={menu} onAddToCart={handleAddToCart} />
         ))}
       </div>

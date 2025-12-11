@@ -10,9 +10,18 @@ Render는 기본적으로 프로젝트 루트에서 `index.js`를 찾으려고 �
 
 ## 해결 방법
 
-### ✅ 방법 1: Root Directory 설정 (권장)
+### ✅ 코드 수정 완료
 
-Render 대시보드에서 Web Service 설정:
+프로젝트에 다음 변경사항이 적용되었습니다:
+
+1. **`server/index.js` 파일 생성**: Render가 찾는 `index.js` 파일을 생성했습니다.
+2. **`server/package.json` 수정**: `main` 필드를 `index.js`로 변경하고 `start` 스크립트를 업데이트했습니다.
+
+이제 Render가 자동으로 `index.js`를 찾을 수 있습니다.
+
+### ✅ Render 대시보드 설정
+
+#### 방법 1: Root Directory를 `server`로 설정 (권장)
 
 1. **Settings** 탭으로 이동
 2. **Root Directory** 필드에 `server` 입력
@@ -22,14 +31,21 @@ Render 대시보드에서 Web Service 설정:
 이렇게 설정하면:
 - Render는 `/opt/render/project/src/server/` 경로에서 작업합니다
 - `npm start`가 `server/package.json`의 `start` 스크립트를 실행합니다
-- `start` 스크립트는 `node server.js`를 실행합니다
+- `start` 스크립트는 `node index.js`를 실행합니다 (자동으로 `server.js`를 import)
 
-### ✅ 방법 2: 경로를 포함한 명령어 사용
+#### 방법 2: Root Directory를 비우고 경로 지정
 
 Root Directory를 비워두고 (프로젝트 루트):
 
 1. **Build Command**: `cd server && npm install`
 2. **Start Command**: `cd server && npm start`
+
+#### 방법 3: Root Directory를 비우고 직접 실행
+
+Root Directory를 비워두고:
+
+1. **Build Command**: `cd server && npm install`
+2. **Start Command**: `cd server && node index.js`
 
 ### ❌ 잘못된 설정 예시
 
@@ -45,12 +61,14 @@ Root Directory를 비워두고 (프로젝트 루트):
 
 ```json
 {
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   }
 }
 ```
+
+**참고**: `index.js` 파일이 `server.js`를 import하므로 기능은 동일합니다.
 
 ### 2. 파일 구조 확인
 프로젝트 구조가 다음과 같은지 확인:
@@ -58,8 +76,9 @@ Root Directory를 비워두고 (프로젝트 루트):
 ```
 order-app/
 ├── server/
-│   ├── server.js      ← 메인 서버 파일
-│   ├── package.json   ← npm 설정
+│   ├── index.js       ← Render 진입점 (server.js를 import)
+│   ├── server.js      ← 실제 서버 로직
+│   ├── package.json   ← npm 설정 (main: "index.js")
 │   ├── config/
 │   ├── controllers/
 │   └── routes/

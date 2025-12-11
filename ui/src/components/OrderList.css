@@ -101,3 +101,15 @@
   font-weight: 500;
 }
 
+.order-list__loading,
+.order-list__error {
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.order-list__error-message {
+  color: #dc2626;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
