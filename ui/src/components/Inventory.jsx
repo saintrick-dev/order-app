@@ -20,6 +20,12 @@ function Inventory() {
         <div className="inventory__error">
           <p>재고 정보를 불러올 수 없습니다.</p>
           <p className="inventory__error-message">{error}</p>
+          <button 
+            className="inventory__retry-btn"
+            onClick={() => window.location.reload()}
+          >
+            새로고침
+          </button>
         </div>
       </div>
     );

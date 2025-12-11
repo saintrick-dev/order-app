@@ -25,7 +25,12 @@ export function OrderProvider({ children }) {
         }
       } catch (err) {
         console.error('❌ 주문 로드 오류:', err);
-        setError(err.message);
+        // 에러 메시지를 사용자 친화적으로 변환
+        let errorMessage = err.message;
+        if (err.message.includes('서버에 연결할 수 없습니다')) {
+          errorMessage = '서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.';
+        }
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

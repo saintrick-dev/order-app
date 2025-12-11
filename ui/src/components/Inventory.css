@@ -107,4 +107,21 @@
   color: #dc2626;
   margin-top: 0.5rem;
   font-size: 0.875rem;
+  white-space: pre-line;
+}
+
+.inventory__retry-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.inventory__retry-btn:hover {
+  background-color: #1d4ed8;
 }

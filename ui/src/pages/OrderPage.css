@@ -25,6 +25,7 @@
   color: #dc2626;
   margin-top: 0.5rem;
   font-size: 0.875rem;
+  white-space: pre-line;
 }
 
 .order-page__retry-btn {
