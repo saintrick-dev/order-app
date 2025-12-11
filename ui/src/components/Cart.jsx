@@ -1,6 +1,6 @@
 import './Cart.css';
 
-function Cart({ items, onOrder, onUpdateQuantity }) {
+function Cart({ items, onOrder, onUpdateQuantity, isOrdering = false }) {
   const totalPrice = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
   const formatOptions = (options) => {
@@ -78,10 +78,10 @@ function Cart({ items, onOrder, onUpdateQuantity }) {
         <button
           className="cart__order-button"
           onClick={onOrder}
-          disabled={items.length === 0}
-          aria-label="주문하기"
+          disabled={items.length === 0 || isOrdering}
+          aria-label={isOrdering ? '주문 중' : '주문하기'}
         >
-          주문하기
+          {isOrdering ? '주문 중...' : '주문하기'}
         </button>
       </div>
     </div>

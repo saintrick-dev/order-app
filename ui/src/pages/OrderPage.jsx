@@ -8,6 +8,7 @@ import './OrderPage.css';
 
 function OrderPage() {
   const [cartItems, setCartItems] = useState([]);
+  const [isOrdering, setIsOrdering] = useState(false);
   const { addOrder } = useOrders();
   const { menus, canOrder, canAddToCart, decreaseInventoryForOrder, loading, error } = useInventory();
   const { showToast } = useToast();
@@ -107,6 +108,9 @@ function OrderPage() {
       return;
     }
 
+    // 주문 중 상태로 변경
+    setIsOrdering(true);
+
     const totalPrice = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
     
     try {
@@ -131,6 +135,9 @@ function OrderPage() {
     } catch (error) {
       showToast(error.message || '주문 처리 중 오류가 발생했습니다.', 'error');
       console.error('Order error:', error);
+    } finally {
+      // 주문 완료 후 버튼 다시 활성화
+      setIsOrdering(false);
     }
   }, [cartItems, canOrder, addOrder, decreaseInventoryForOrder, showToast]);
 
@@ -186,6 +193,7 @@ function OrderPage() {
         items={cartItems}
         onOrder={handleOrder}
         onUpdateQuantity={handleUpdateQuantity}
+        isOrdering={isOrdering}
       />
     </div>
   );
